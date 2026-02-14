@@ -1,9 +1,10 @@
 import logging
 import getpass
+import os
 from pathlib import Path
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from yugayu.config import load_config
+from yugayu.core.config import load_config
 
 LOG_ROOT = Path.home() / ".yugayu" / "logs"
 LOG_FORMAT = "[%(asctime)s] [USER: %(user)s] [%(levelname)s] %(message)s"
@@ -27,7 +28,7 @@ def setup_logger():
     # 20MB chunks, practically infinite backups (9999)
     file_handler = RotatingFileHandler(
         get_daily_log_file(),
-        maxBytes=20 * 1024 * 1024,  # 20 MB chunks
+        maxBytes=20 * 1024 * 1024,
         backupCount=9999            
     )
     
@@ -50,12 +51,12 @@ def check_log_size_warning() -> bool:
 
 def log_command(command: str, status: str = "SUCCESS", origin: str = None):
     logger = setup_logger()
-    user = origin if origin else getpass.getuser()
+    user = origin or os.environ.get("YUGAYU_ACTOR") or getpass.getuser()
     message = f"[STATUS: {status}] [CMD: {command}]"
     logger.info(message, extra={"user": user})
 
 def log_error(command: str, error_msg: str, origin: str = None):
     logger = setup_logger()
-    user = origin if origin else getpass.getuser()
+    user = origin or os.environ.get("YUGAYU_ACTOR") or getpass.getuser()
     message = f"[STATUS: FAILED] [CMD: {command}] [ERROR: {error_msg}]"
     logger.error(message, extra={"user": user})
