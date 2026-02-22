@@ -4,7 +4,7 @@ from yugayu.core.logger import get_daily_log_file
 
 console = Console()
 
-def cli_log(lines: int = typer.Option(20, help="Number of recent log lines to show")):
+def cli_activity(lines: int = typer.Option(20, help="Number of recent log lines to show")):
     """View the most recent activity logs for today."""
     log_file = get_daily_log_file()
     

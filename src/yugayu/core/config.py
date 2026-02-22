@@ -26,14 +26,20 @@ class LabConfig:
     ayus: List[ayuEntry] = field(default_factory=list)
     models: List[ayuModel] = field(default_factory=list)
 
-CONFIG_PATH = Path.home() / ".yugayu" / "config.yaml"
+# REMOVED: CONFIG_PATH = Path.home() / ".yugayu" / "config.yaml"
+
+def get_config_path() -> Path:
+    """Dynamically fetch the config path so Pytest can mock it."""
+    return Path.home() / ".yugayu" / "config.yaml"
 
 def load_config() -> LabConfig:
     """Reads ~/.yugayu/config.yaml and returns a LabConfig object."""
-    if not CONFIG_PATH.exists():
+    config_path = get_config_path()
+    
+    if not config_path.exists():
         return LabConfig(lab_root=str(Path.home() / "yugayu-lab"))
     
-    with open(CONFIG_PATH, "r") as f:
+    with open(config_path, "r") as f:
         data = yaml.safe_load(f)
         
     ayus = [ayuEntry(**p) for p in data.get("ayus", [])]
@@ -50,8 +56,9 @@ def load_config() -> LabConfig:
 
 def save_config(config: LabConfig):
     """Saves the LabConfig object back to the filesystem."""
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(CONFIG_PATH, "w") as f:
+    config_path = get_config_path()
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(config_path, "w") as f:
         yaml.dump(asdict(config), f, default_flow_style=False)
 
 def get_lab_root() -> Path:

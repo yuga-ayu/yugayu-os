@@ -1,3 +1,6 @@
+# TODO: [SECURITY] Merkle Chain Ledger: Upgrade RotatingFileHandler to hash (SHA-256) each log entry against the previous entry's fingerprint.
+# TODO: [TRACKING] Append compute usage metadata (tokens, VRAM lease time) to the daily execution ledger.
+
 import logging
 import getpass
 import os

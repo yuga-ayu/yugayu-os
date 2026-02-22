@@ -1,3 +1,6 @@
+# TODO: [COMPLIANCE] Cryptographic License Ledger: When downloading a base model (e.g., FLUX), require and log its specific license tag (Apache 2.0, MIT, Proprietary).
+# TODO: [COMPLIANCE] Block project execution if a commercial Ayu attempts to load a Non-Commercial/Proprietary base model.
+
 import typer
 import sys
 from rich.console import Console
@@ -8,7 +11,7 @@ from yugayu.core.logger import log_command, log_error
 
 console = Console()
 
-def cli_init(
+def cli_setup_lab(
     lab_root: str = typer.Option("~/yugayu-lab", help="Where to build the lab"),
     nas_path: str = typer.Option(None, help="Path to your NAS backup folder"),
     reset: bool = typer.Option(False, help="Overwrite existing config")

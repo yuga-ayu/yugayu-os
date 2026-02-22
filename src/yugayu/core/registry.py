@@ -4,8 +4,8 @@ Statuses: 'active', 'deprecated', 'blacklisted'
 """
 
 COMMAND_REGISTRY = {
-    "init":   {"module": "init",   "status": "active"},
-    "create": {"module": "create", "status": "active"},
-    "info":   {"module": "info",   "status": "active"},
-    "log":    {"module": "log",    "status": "active"}
+    "setup-lab":  {"module": "setup_lab",  "status": "active"},
+    "create-ayu": {"module": "create_ayu", "status": "active"},
+    "activity":   {"module": "activity",   "status": "active"},
+    "status":    {"module": "status",    "status": "active"}
 }

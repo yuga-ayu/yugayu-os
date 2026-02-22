@@ -5,7 +5,7 @@ from yugayu.core.logger import log_command, log_error
 
 console = Console()
 
-def cli_info():
+def cli_status():
     """Show current lab status."""
     full_cmd = " ".join(sys.argv)
     

@@ -3,3 +3,7 @@ __pycache__/
 .venv/
 .DS_Store
 dist/
+test/logs/*
+
+# But DO NOT ignore the .gitkeep file
+!test/logs/.gitkeep

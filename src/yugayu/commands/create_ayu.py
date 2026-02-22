@@ -1,3 +1,6 @@
+# TODO: [TRACKING] Shared Resource Ledger: Create a symlink map tracking which Ayus depend on which shared /models/base weights.
+# TODO: [TRACKING] Dependency Graph: Prevent deletion of a base model if active Ayus are still linked to it.
+
 import sys
 import subprocess
 import uuid
@@ -9,7 +12,7 @@ from yugayu.core.logger import log_command, log_error
 
 console = Console()
 
-def cli_create(ayu_name: str):
+def cli_create_ayu(ayu_name: str):
     """Scaffold a new AI ayu with Git, UV, and an IAM Identity."""
     full_cmd = " ".join(sys.argv)
     
