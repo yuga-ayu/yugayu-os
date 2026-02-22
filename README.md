@@ -17,7 +17,7 @@ This implementation solves the critical bottlenecks of local and distributed AI 
 
 ## 🚀 Installation (Parvati Prototype)
 ```bash
-git clone [https://github.com/yugayu/yugayu-os.git](https://github.com/yugayu/yugayu-os.git)
+git clone [https://github.com/yuga-ayu/yugayu-os.git](https://github.com/yuga-ayu/yugayu-os.git)
 cd yugayu-os
 uv tool install -e .
 
