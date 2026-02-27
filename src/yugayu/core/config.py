@@ -41,6 +41,11 @@ def load_config() -> LabConfig:
     
     with open(config_path, "r") as f:
         data = yaml.safe_load(f)
+
+    # FIX: If the file is empty, yaml.safe_load returns None. 
+    # We must explicitly set it to an empty dict.
+    if data is None:
+        data = {}
         
     ayus = [ayuEntry(**p) for p in data.get("ayus", [])]
     models = [ayuModel(**m) for m in data.get("models", [])]
