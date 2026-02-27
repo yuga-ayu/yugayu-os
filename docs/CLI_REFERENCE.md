@@ -11,7 +11,7 @@ Initializes the global Yugayu Hub environment.
 
 ### `yugayu status`
 Reports the health and status of the Hub.
-* **Action:** Verifies the existence of the `state-management` configuration and lists active isolated entities.
+* **Action:** Verifies the existence of the `state-management` configuration and lists active isolated ayus.
 * **Usage:** `yugayu status`
 
 ### `yugayu tree <target>`
@@ -23,7 +23,7 @@ Introspection tool for visualizing directory structures.
 ## Entity (Ayu) Management
 
 ### `yugayu create-ayu <name>`
-Scaffolds a new, isolated AI entity (Ayu) within the Zero-Trust environment.
+Scaffolds a new, isolated AI entity (ayu) within the Zero-Trust environment.
 * **Action:** * Creates an isolated directory in `~/yugayu-lab/ayus/<name>`.
   * Initializes Git and a `uv` Python environment.
   * Generates a cryptographic `.yugayu-identity` wallet for the `iam-bouncer`.
