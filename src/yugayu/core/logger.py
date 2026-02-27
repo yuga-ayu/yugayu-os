@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from yugayu.core.config import load_config
+from yugayu.core.state_management import load_config
 
 LOG_ROOT = Path.home() / ".yugayu" / "logs"
 LOG_FORMAT = "[%(asctime)s] [USER: %(user)s] [%(levelname)s] %(message)s"

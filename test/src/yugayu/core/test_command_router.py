@@ -1,12 +1,13 @@
-from unittest.mock import patch, MagicMock
-from yugayu.core.gateway import yugayu_gateway
+from unittest.mock import patch
+from yugayu.core.command_router import yugayu_router
 
 # Dummy function to simulate a protected CLI command
-@yugayu_gateway
+@yugayu_router
 def dummy_command(ayu_name: str, payload: str):
     return "command_executed"
 
-@patch("yugayu.core.gateway.verify_identity")
+# Update the patch to target the class method
+@patch("yugayu.core.iam_bouncer.Ed25519Bouncer.verify_identity")
 def test_gateway_blocks_invalid_identity(mock_verify):
     # Simulate the IAM check failing by returning False
     mock_verify.return_value = False
@@ -15,7 +16,8 @@ def test_gateway_blocks_invalid_identity(mock_verify):
     result = dummy_command(ayu_name="rogue-agent", payload="malicious-data")
     assert result is None
 
-@patch("yugayu.core.gateway.verify_identity")
+# Update the patch to target the class method
+@patch("yugayu.core.iam_bouncer.Ed25519Bouncer.verify_identity")
 def test_gateway_allows_valid_identity(mock_verify):
     # Simulate a valid cryptographic signature
     mock_verify.return_value = True

@@ -2,7 +2,7 @@ import typer
 import importlib
 from rich.console import Console
 from yugayu.core.registry import COMMAND_REGISTRY
-from yugayu.core.gateway import yugayu_gateway
+from yugayu.core.command_router import yugayu_router
 
 app = typer.Typer(help="Yugayu AI Lab Orchestrator")
 console = Console()
@@ -23,7 +23,7 @@ for cmd_name, meta in COMMAND_REGISTRY.items():
         func = getattr(module, func_name)
         
         # Wrap the function with our pre-flight checks and middleware
-        wrapped_func = yugayu_gateway(func)
+        wrapped_func = yugayu_router(func)
         
         # Attach to the CLI interface
         is_deprecated = (meta["status"] == "deprecated")

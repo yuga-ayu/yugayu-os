@@ -4,8 +4,9 @@ from yugayu.main import app
 
 runner = CliRunner()
 
-@patch("yugayu.core.gateway.verify_identity")
-@patch("yugayu.commands.create_ayu.load_config") # We mock load_config so we can inject a fake path
+# Update the patch to target the class method
+@patch("yugayu.core.iam_bouncer.Ed25519Bouncer.verify_identity")
+@patch("yugayu.commands.create_ayu.load_config") 
 @patch("subprocess.run")
 def test_create_ayu(mock_subprocess, mock_load_config, mock_verify, tmp_path):
     # 1. Create a fake config object that points to a temporary Pytest directory

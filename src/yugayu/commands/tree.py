@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from rich.console import Console
-from yugayu.core.config import load_config
+from yugayu.core.state_management import load_config
 
 console = Console()
 

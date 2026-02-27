@@ -1,6 +1,6 @@
 import sys
 from rich.console import Console
-from yugayu.core.config import load_config
+from yugayu.core.state_management import load_config
 from yugayu.core.logger import log_command, log_error
 
 console = Console()

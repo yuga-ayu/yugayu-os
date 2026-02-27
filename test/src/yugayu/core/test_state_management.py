@@ -1,4 +1,4 @@
-from yugayu.core.config import load_config, save_config, LabConfig, ayuEntry
+from yugayu.core.state_management import load_config, save_config, LabConfig, ayuEntry
 
 def test_config_lifecycle(mock_lab):
     # mock_lab fixture ensures we are working in the sandboxed ~/.yugayu/

@@ -6,7 +6,7 @@ import sys
 from rich.console import Console
 from rich.panel import Panel
 from pathlib import Path
-from yugayu.core.config import load_config, save_config
+from yugayu.core.state_management import load_config, save_config
 from yugayu.core.logger import log_command, log_error
 
 console = Console()

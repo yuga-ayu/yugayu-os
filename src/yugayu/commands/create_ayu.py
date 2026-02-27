@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
-from yugayu.core.config import load_config, save_config, ayuEntry
+from yugayu.core.state_management import load_config, save_config, ayuEntry
 from yugayu.core.logger import log_command, log_error
 
 console = Console()
