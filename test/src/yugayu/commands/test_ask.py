@@ -7,7 +7,7 @@ runner = CliRunner()
 
 @patch('yugayu.core.command_router.Ed25519Bouncer.verify_identity', return_value=True)
 @patch('yugayu.commands.ask.generate_image', return_value=True)
-def test_ask_command_success(mock_generate, mock_verify):
+def test_ask_command_success(mock_generate, mock_verify, mock_lab):
     # Simulate running: yugayu ask test-ayu --prompt "test"
     result = runner.invoke(app, ["ask", "test-ayu", "test prompt"])
     
@@ -18,7 +18,7 @@ def test_ask_command_success(mock_generate, mock_verify):
 
 @patch('yugayu.core.command_router.Ed25519Bouncer.verify_identity', return_value=True)
 @patch('yugayu.commands.ask.generate_image', return_value=False)
-def test_ask_command_failure(mock_generate, mock_verify):
+def test_ask_command_failure(mock_generate, mock_verify, mock_lab):
     # Simulate a failed generation
     result = runner.invoke(app, ["ask", "test-ayu", "test prompt"])
     

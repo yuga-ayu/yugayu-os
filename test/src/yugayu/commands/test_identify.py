@@ -6,7 +6,7 @@ from unittest.mock import patch
 runner = CliRunner()
 
 @patch('yugayu.core.command_router.Ed25519Bouncer.verify_identity', return_value=True)
-def test_identify_command(mock_verify):
+def test_identify_command(mock_verify, mock_lab):
     # Simulate querying the ledger for an entity
     result = runner.invoke(app, ["identify", "test-entity"])
     
