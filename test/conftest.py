@@ -25,6 +25,10 @@ def mock_lab(tmp_path, monkeypatch):
     with open(config_path, "w") as f:
         yaml.dump(initial_config, f)
         
+    # Provision a dummy admin identity to authorize the test suite through the Bouncer
+    admin_wallet = config_dir / "admin-identity.json"
+    admin_wallet.write_text('{"dummy": "key"}')
+        
     return fake_lab_root
 
 @pytest.fixture

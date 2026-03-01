@@ -1,7 +1,7 @@
 from unittest.mock import patch
-from yugayu.core.iam_bouncer import Ed25519Bouncer
+from yugayu.core.security.identity_verifier import Ed25519Bouncer
 
-@patch("yugayu.core.iam_bouncer.Path.exists")
+@patch("yugayu.core.security.identity_verifier.Path.exists")
 def test_verify_identity_checks_wallet(mock_exists):
     # Setup the bouncer class
     bouncer = Ed25519Bouncer()

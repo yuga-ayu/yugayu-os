@@ -7,7 +7,7 @@ def dummy_command(ayu_name: str, payload: str):
     return "command_executed"
 
 # Update the patch to target the class method
-@patch("yugayu.core.iam_bouncer.Ed25519Bouncer.verify_identity")
+@patch("yugayu.core.security.identity_verifier.Ed25519Bouncer.verify_identity")
 def test_gateway_blocks_invalid_identity(mock_verify):
     # Simulate the IAM check failing by returning False
     mock_verify.return_value = False
@@ -17,7 +17,7 @@ def test_gateway_blocks_invalid_identity(mock_verify):
     assert result is None
 
 # Update the patch to target the class method
-@patch("yugayu.core.iam_bouncer.Ed25519Bouncer.verify_identity")
+@patch("yugayu.core.security.identity_verifier.Ed25519Bouncer.verify_identity")
 def test_gateway_allows_valid_identity(mock_verify):
     # Simulate a valid cryptographic signature
     mock_verify.return_value = True

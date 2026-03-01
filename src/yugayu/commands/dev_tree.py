@@ -1,14 +1,22 @@
 import subprocess
+import os
 from pathlib import Path
 from rich.console import Console
-from yugayu.core.state_management import load_config
+from yugayu.core.state.ledger_manager import load_config
 
 console = Console()
 
-def cli_tree(target: str):
-    """Print the directory tree of the current 'repo' or the configured 'lab'."""
+def find_repo_root():
+    """Traverse up to find the pyproject.toml which marks the repo root."""
+    current = Path.cwd()
+    for parent in [current] + list(current.parents):
+        if (parent / "pyproject.toml").exists():
+            return parent
+    return current
+
+def cli_dev_tree(target: str):
     if target == "repo":
-        target_path = Path.cwd()
+        target_path = find_repo_root()
         ignore_str = "venv|__pycache__|logs|.git"
         console.print(f"🌳 [bold cyan]Tree for Yugayu Repository ({target_path})[/bold cyan]")
     elif target == "lab":
@@ -21,8 +29,6 @@ def cli_tree(target: str):
         return
 
     try:
-        subprocess.run(["tree", "-I", ignore_str], cwd=target_path, check=True)
-    except FileNotFoundError:
-        console.print("[red]❌ 'tree' command not found. Install via 'sudo apt install tree'.[/red]")
+        subprocess.run(["tree", str(target_path), "-I", ignore_str], check=True)
     except Exception as e:
-        console.print(f"[red]❌ Error running tree: {e}[/red]")
+        console.print(f"[red]❌ Error: {e}[/red]")

@@ -1,8 +1,9 @@
-from yugayu.core.state_management import load_config, save_config, LabConfig, ayuEntry
+import os
+import pytest
+from pathlib import Path
+from yugayu.core.state.ledger_manager import load_config, save_config, LabConfig, ayuEntry
 
 def test_config_lifecycle(mock_lab):
-    # mock_lab fixture ensures we are working in the sandboxed ~/.yugayu/
-    
     # 1. Test loading a non-existent config (should create defaults)
     config = load_config()
     assert config.lab_root.endswith("yugayu-lab")

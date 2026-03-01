@@ -1,4 +1,4 @@
-from yugayu.core.key_negotiator import KyberNegotiator
+from yugayu.core.security.key_exchange import KyberNegotiator
 
 def test_kyber_negotiator_flow():
     """Test the concrete Kyber implementation of the KeyNegotiator protocol."""

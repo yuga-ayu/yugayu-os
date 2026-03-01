@@ -1,26 +1,33 @@
-# Yugayu AI Orchestration Protocol (Project Parvati)
+# Yugayu AI Lab Orchestrator
 
 ![CI Status](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml/badge.svg)
 [![License: BSL](https://img.shields.io/badge/License-BSL-blue.svg)](./LICENSE)
+[![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-purple.svg)]()
 
-**Yugayu OS** is a Distributed, Zero-Trust AI Operating System designed to decouple AI intent from hardware execution using Post-Quantum Cryptography (PQC).
+Yugayu OS is a zero-trust, distributed AI operating system designed to orchestrate isolated AI entities across local, multi-node hardware environments. 
 
-Current AI infrastructure suffers from massive VRAM fragmentation, storage bloat, and insecure execution environments. Yugayu solves this by scaffolding isolated AI entities (ayus) across a trustless, multi-node network, utilizing cryptographic passports and a centralized immutable ledger.
+It decouples AI execution intent from hardware via Post-Quantum Cryptography (PQC) and mutual Merkle-tree authentication. By scaffolding isolated AI entities across a trustless network, Yugayu prevents VRAM fragmentation, storage bloat, and insecure execution, ensuring highly capable models (like FLUX.2) run securely in local-first, offline environments.
 
-## Core Architecture (v0.2.0)
-* **Hot-Swappable E2E Transport:** Built on Python `typing.Protocol` to seamlessly integrate Kyber key encapsulation and AES-256-GCM encryption.
-* **iam-bouncer:** Cryptographically signs and verifies API requests using local `.yugayu-identity` wallets. Fails closed.
-* **state-management:** Handles the secure storage and rotation of keys, active sessions, and global lab configuration.
-* **Prana Economy:** A closed-loop token system that rewards ayus for safe generations and quarantines them for malformed outputs.
+## Core Architecture
+The system enforces strict separation between the **Control Plane** (`~/.yugayu`) and the **Physical Execution Lab** (`~/yugayu-lab`). It is divided into distinct, hot-swappable modules:
 
-## Installation & Quickstart
+* **Security:** Handles PQC key encapsulation, AES-256-GCM transport, and strict asymmetric identity verification via the `iam-bouncer`. Fails closed.
+* **Economy:** Manages a closed-loop Prana token system enforcing execution costs and hardware resource allocation based on entity reputation ("Honor Scores").
+* **State (The Ledger):** Maintains an immutable Merkle-tree blockchain. Every entity, shared library, and execution engine possesses a cryptographic passport. 
+* **Compliance:** Enforces boundary checks on open-source model licenses and strictly blocks external telemetry at the OS level.
+* **Execution:** A dynamic capability registry that routes verified payloads to the appropriate local GPU hardware or vector database node.
 
-Yugayu uses `uv` for lightning-fast dependency management.
-
+## Installation
 ```bash
 git clone [https://github.com/yuga-ayu/yugayu-os.git](https://github.com/yuga-ayu/yugayu-os.git)
 cd yugayu-os
 uv tool install -e .
 
-yugayu setup_lab
-yugayu create-ayu my-first-agent
+# Bootstrap the Lab and provision the Admin Master Key
+yugayu setup-lab
+
+# Interactively scaffold a new AI entity
+yugayu wakeup-ayu
+
+# Query the cryptographic ledger
+yugayu identify my-vision-agent

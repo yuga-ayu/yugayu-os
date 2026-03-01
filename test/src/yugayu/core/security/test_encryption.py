@@ -1,4 +1,4 @@
-from yugayu.core.e2e_cipher import AES256GCMCipher
+from yugayu.core.security.encryption import AES256GCMCipher
 
 def test_aes_cipher_encrypt_decrypt():
     """Test the concrete AES-GCM implementation of the E2ECipher protocol."""

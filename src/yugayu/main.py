@@ -1,5 +1,7 @@
 import typer
 import importlib
+import os
+from pathlib import Path
 from rich.console import Console
 from yugayu.core.registry import COMMAND_REGISTRY
 from yugayu.core.command_router import yugayu_router
@@ -7,32 +9,34 @@ from yugayu.core.command_router import yugayu_router
 app = typer.Typer(help="Yugayu AI Lab Orchestrator")
 console = Console()
 
-# Iterate through our central registry dynamically
+# Auto-detect developer mode if running from source (.git exists)
+is_dev_mode = Path(".git").exists() or os.environ.get("YUGAYU_DEV") == "1"
+
 for cmd_name, meta in COMMAND_REGISTRY.items():
-    
     if meta["status"] == "blacklisted":
         continue
         
+    if meta.get("env") == "dev" and not is_dev_mode:
+        continue
+        
     try:
-        # Dynamically load the python file
         module_path = f"yugayu.commands.{meta['module']}"
         module = importlib.import_module(module_path)
-        
-        # Grab the target function
         func_name = f"cli_{meta['module']}"
         func = getattr(module, func_name)
         
-        # Wrap the function with our pre-flight checks and middleware
         wrapped_func = yugayu_router(func)
-        
-        # Attach to the CLI interface
         is_deprecated = (meta["status"] == "deprecated")
+        
         app.command(name=cmd_name, deprecated=is_deprecated)(wrapped_func)
         
     except ImportError as e:
-        console.print(f"[red]Error loading command '{cmd_name}': Module not found. ({e})[/red]")
+        # Silently skip incomplete MVP commands during testing unless in dev mode
+        if is_dev_mode:
+            console.print(f"[red]Dev Warning: Module '{cmd_name}' not found. ({e})[/red]")
     except AttributeError:
-        console.print(f"[red]Error loading command '{cmd_name}': Function '{func_name}' not found.[/red]")
+        if is_dev_mode:
+            console.print(f"[red]Dev Warning: Function '{func_name}' not found for '{cmd_name}'.[/red]")
 
 if __name__ == "__main__":
     app()
