@@ -6,7 +6,7 @@ dist/
 test/logs/*
 docs/INTERNAL_STATE.md
 docs/YUGAYU_CUR_STATE.md
-docs/scratchpad.md
+docs
 test/logs/*.xml
 
 # But DO NOT ignore the .gitkeep file
