@@ -3,7 +3,6 @@ from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import List, Optional, Protocol
 
-# --- LAB STATE MANAGEMENT (Legacy CLI Config) ---
 @dataclass
 class ayuModel:
     name: str
@@ -24,6 +23,7 @@ class LabConfig:
     nas_path: Optional[str] = None
     hf_token: Optional[str] = None
     max_log_size_mb: int = 1024
+    admin_identities: List[str] = field(default_factory=lambda: ["admin-cli"]) # NEW: RBAC Tracking
     ayus: List[ayuEntry] = field(default_factory=list)
     models: List[ayuModel] = field(default_factory=list)
 
@@ -45,6 +45,7 @@ def load_config() -> LabConfig:
         nas_path=data.get("nas_path"),
         hf_token=data.get("hf_token"),
         max_log_size_mb=data.get("max_log_size_mb", 1024),
+        admin_identities=data.get("admin_identities", ["admin-cli"]),
         ayus=ayus,
         models=models
     )
@@ -55,7 +56,6 @@ def save_config(config: LabConfig):
     with open(config_path, "w") as f:
         yaml.dump(asdict(config), f, default_flow_style=False)
 
-# --- CRYPTOGRAPHIC SESSION STATE MANAGEMENT (v0.2.0) ---
 @dataclass
 class SessionState:
     session_id: str
@@ -63,10 +63,8 @@ class SessionState:
     is_active: bool
 
 class StateStore(Protocol):
-    def save_session(self, ayu_name: str, state: SessionState) -> None:
-        ...
-    def load_session(self, ayu_name: str) -> SessionState | None:
-        ...
+    def save_session(self, ayu_name: str, state: SessionState) -> None: ...
+    def load_session(self, ayu_name: str) -> SessionState | None: ...
 
 class MemoryStateStore:
     def __init__(self):

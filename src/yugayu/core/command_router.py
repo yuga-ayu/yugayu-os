@@ -1,38 +1,52 @@
 import os
+import json
 from functools import wraps
 from rich.console import Console
 from pathlib import Path
 from yugayu.core.security.identity_verifier import Ed25519Bouncer
+from yugayu.core.security.enforcer import quarantine_entity
 
 console = Console()
 
 def yugayu_router(func):
-    """Strict Zero-Trust Middleware router for ALL CLI commands."""
+    """Strict Zero-Trust Middleware router enforcing RBAC via Identity."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         
-        # 1. Genesis Exception: Only the setup command can run without prior identity
+        # 1. Genesis Exception
         if func.__name__ == "cli_setup_lab":
             return func(*args, **kwargs)
             
-        admin_id = "admin-cli"
         config_dir = Path.home() / ".yugayu"
         admin_wallet_path = config_dir / "admin-identity.json"
         
-        # 2. Strict Check: If no identity exists, block execution completely.
+        # 2. The Guest Default
         if not admin_wallet_path.exists():
-            console.print("❌ [bold red]SYSTEM OFFLINE: Local Admin Identity not found.[/bold red]")
-            console.print(f"💡 [yellow]Run `yugayu setup-lab` to provision your cryptographic passport in {config_dir}.[/yellow]")
+            console.print("⚠️ [yellow]Running as Guest. Execution and State access restricted.[/yellow]")
+            console.print(f"💡 [dim]Run `yugayu setup-lab` to provision your cryptographic passport.[/dim]")
             return None
                 
-        # 3. Strict Verification: Every command goes through the bouncer
+        # 3. RBAC Role Extraction
+        try:
+            with open(admin_wallet_path, "r") as f:
+                wallet = json.load(f)
+            role = wallet.get("role", "guest")
+            entity_id = wallet.get("entity_id", "unknown")
+        except Exception:
+            role = "guest"
+            entity_id = "corrupted-identity"
+            
+        if role not in ["admin", "maintainer"]:
+            console.print(f"❌ [bold red]ACCESS DENIED: Role '{role}' possesses insufficient clearance.[/bold red]")
+            quarantine_entity(entity_id, "Attempted unauthorized execution boundary bypass.")
+            return None
+
+        # 4. Strict Cryptographic Verification
         bouncer = Ed25519Bouncer()
-        
-        # MVP: Simulating the signed payload validation
-        if bouncer.verify_identity(admin_id, b"cli_payload", b"simulated_signature", custom_path=admin_wallet_path):
+        if bouncer.verify_identity(entity_id, b"cli_payload", b"simulated_signature", custom_path=admin_wallet_path):
             return func(*args, **kwargs)
         else:
-            console.print("[red]Access Denied by Identity Verifier.[/red]")
+            console.print("[red]Access Denied by Cryptographic Bouncer.[/red]")
             return None
             
     return wrapper

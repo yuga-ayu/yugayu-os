@@ -1,6 +1,8 @@
 import pytest
 import yaml
 import time
+import json
+import base64
 from pathlib import Path
 from typer.testing import CliRunner
 
@@ -11,12 +13,9 @@ def mock_lab(tmp_path, monkeypatch):
     fake_lab_root = fake_home / "yugayu-lab"
     fake_home.mkdir(parents=True)
     
-    # Force the OS to think /tmp/ is the user's home directory
     monkeypatch.setattr(Path, "home", lambda: fake_home)
-    # Mock the environment variable for .expanduser()
     monkeypatch.setenv("HOME", str(fake_home))
     
-    # Initialize a base config
     config_dir = fake_home / ".yugayu"
     config_dir.mkdir()
     config_path = config_dir / "config.yaml"
@@ -25,9 +24,15 @@ def mock_lab(tmp_path, monkeypatch):
     with open(config_path, "w") as f:
         yaml.dump(initial_config, f)
         
-    # Provision a dummy admin identity to authorize the test suite through the Bouncer
+    # Provision a VALID dummy admin identity to authorize the test suite
     admin_wallet = config_dir / "admin-identity.json"
-    admin_wallet.write_text('{"dummy": "key"}')
+    valid_json = {
+        "entity_id": "admin-cli",
+        "role": "maintainer",
+        "public_key": base64.b64encode(b"dummy_pub").decode('utf-8'),
+        "private_key": base64.b64encode(b"dummy_priv").decode('utf-8')
+    }
+    admin_wallet.write_text(json.dumps(valid_json))
         
     return fake_lab_root
 
@@ -36,10 +41,6 @@ def runner():
     return CliRunner()
 
 def pytest_configure(config):
-    """
-    Automatically generate a timestamped JUnit XML log for EVERY test run,
-    unless the user explicitly provides a different --junitxml path.
-    """
     if not config.option.xmlpath:
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         log_dir = Path("test/logs")
