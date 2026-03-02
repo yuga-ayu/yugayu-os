@@ -1,3 +1,4 @@
+import os
 import pytest
 import yaml
 import time
@@ -5,6 +6,10 @@ import json
 import base64
 from pathlib import Path
 from typer.testing import CliRunner
+
+# [SECURITY] Force Maintainer Privilege for the CI/CD test runner 
+# before yugayu.main is imported by the tests.
+os.environ["YUGAYU_DEV"] = "1"
 
 @pytest.fixture
 def mock_lab(tmp_path, monkeypatch):
