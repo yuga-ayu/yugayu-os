@@ -1,18 +1,17 @@
 # Yugayu OS Release Notes
 All notable changes to this project will be documented in this file.
 
-## [v0.4.0] - Zero-Trust RBAC & Identity Enforcement
+## [v0.4.0] - Zero-Trust RBAC & Secure Artifacts
 **Date:** 2026-03-01
 
-**Description:** Solidified the Yugayu Cryptographic Gateway. This release introduces rigid Role-Based Access Control (RBAC) and mathematically seals the execution environment. The OS now enforces a strict Zero-Trust architecture where no AI entity or user can execute commands without verifiable, asymmetric cryptographic clearance.
+**Description:** Solidified the Yugayu Cryptographic Gateway and secured the developer footprint. The OS now mathematically enforces execution boundaries distinguishing between human maintainers, administrators, and guest users, while strictly separating public architectural documentation from internal AI operational state.
 
 **Core Architecture Implemented:**
 * **Identity Issuer Department:** Centralized Ed25519 cryptographic passport generation (`identity_issuer.py`).
-* **Role-Based Access Control (RBAC):** Cryptographic identities now possess immutable roles (`maintainer`, `admin`, `guest`, `ayu`). Guests are hard-blocked from execution pathways.
-* **Hardware-Level Privilege Detection:** The OS inspects the physical execution path during bootstrapping. It automatically distinguishes between a repository clone (`uv install -e .`) and a standard installation, issuing the appropriate `maintainer` or `admin` passports.
-* **The Enforcer Protocol:** Failed cryptographic signatures or role bypass attempts now trigger the `enforcer.py` module, which permanently quarantines the rogue entity on the immutable ledger.
-* **100% Test Coverage:** The CI pipeline now asserts full coverage across all Security, State, and Gateway components using isolated, sandboxed environments.
-
+* **Role-Based Access Control (RBAC):** Cryptographic identities now possess immutable roles (`maintainer`, `admin`, `guest`, `ayu`). Guests are mathematically blocked from execution pathways.
+* **The Enforcer Protocol:** Failed cryptographic signatures or role bypass attempts now trigger the `enforcer.py` module, quarantining rogue entities on the immutable ledger.
+* **State Isolation:** `dev_export_state.py` now automatically routes sensitive system state snapshots and AI instruction sets into a secured, `.gitignore`-protected `docs/private/` directory.
+* **Public Documentation:** Released formal `PRODUCT_OVERVIEW.md` and `DEVELOPER_GUIDE.md` outlining the Yugayu Symlink Economy and Cryptographic Gateway.
 ## [v0.3.0] - Strict Zero-Trust Control Plane
 **Date:** 2026-02-28
 
