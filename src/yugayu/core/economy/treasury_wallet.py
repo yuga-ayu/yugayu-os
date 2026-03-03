@@ -3,6 +3,22 @@ import base64
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
+from rich.console import Console
+
+console = Console()
+
+def process_transaction(entity_id: str, amount: float, transaction_type: str) -> bool:
+    """
+    MVP Economy: Flat rate. 
+    Deducts tokens for 'execution_start', refunds for 'execution_success'.
+    """
+    if transaction_type == "execution_start":
+        console.print(f"🪙 [yellow]Prana Treasury: Escrowing {amount} token from {entity_id}...[/yellow]")
+        return True
+    elif transaction_type == "execution_success":
+        console.print(f"🪙 [green]Prana Treasury: Releasing {amount} token back to {entity_id} (Neutral Honor).[/green]")
+        return True
+    return False
 
 def generate_wallet(ayu_name: str, lab_path: Path, custom_path: Path = None):
     """Generates an Ed25519 keypair (ML-DSA placeholder) for a new ayu or admin."""

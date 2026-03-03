@@ -1,49 +1,43 @@
 import typer
+import yaml
+from pathlib import Path
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
+from yugayu.core.architect.capability_manager import provision_ayu_from_manifest
 
 console = Console()
 
-def cli_wakeup_ayu():
-    """Interactive sequence to awaken a new or existing Ayu entity."""
+def cli_wakeup_ayu(config_file: str = typer.Option(None, help="Path to an existing ayu-config.yaml")):
+    """Config-driven approach to awaken a new Ayu entity."""
     console.print("\n[bold cyan]🧬 Yugayu OS: Ayu Awakening Sequence[/bold cyan]")
     
-    console.print("Select Awakening Vector:")
-    console.print("  [1] New Entity (Genesis)")
-    console.print("  [2] Local Clone [dim](Not Available)[/dim]")
-    console.print("  [3] Remote Transplant [dim](Not Available)[/dim]")
-    
-    choice = Prompt.ask("Vector", choices=["1", "2", "3"], default="1")
-    
-    if choice != "1":
-        console.print("[red]Vector currently locked by Core.[/red]")
+    if not config_file:
+        console.print("[red]❌ For MVP, please provide a config file: yugayu wakeup-ayu --config-file flux2-fp8-config.yaml[/red]")
         return
         
-    name = Prompt.ask("\n[yellow]Enter Entity Name (e.g., yugayu-vision)[/yellow]")
-    hf_url = Prompt.ask("[yellow]Enter Base Model URL (e.g., HuggingFace path)[/yellow]")
+    config_path = Path(config_file)
+    if not config_path.exists():
+        console.print(f"[red]❌ Config file not found at {config_path}[/red]")
+        return
+        
+    console.print(f"📄 [cyan]Ingesting manifest from {config_file}[/cyan]")
+    with open(config_path, "r") as f:
+        manifest_data = yaml.safe_load(f)
+        
+    name = manifest_data.get("entity", {}).get("name", "unknown-ayu")
     
-    console.print("\n[bold]⚖️  Compliance Audit...[/bold]")
-    console.print(f"Scanning `{hf_url}` for license restrictions and telemetry headers...")
-    console.print("[green]✓ License: Open Source (Compatible)[/green]")
-    console.print("[green]✓ Telemetry: Blocked via Core OS Override[/green]")
+    console.print("\n[bold]⚖️  Compliance & Capability Audit...[/bold]")
+    console.print("[green]✓ Configuration parsed successfully.[/green]")
     
-    if not Confirm.ask("\nCompliance audit passed. Proceed with Genesis?"):
+    action = Prompt.ask("\nAction", choices=["Run Setup", "Abort"], default="Run Setup")
+    if action == "Abort":
         console.print("Awakening aborted.")
         return
         
     console.print(f"\n[bold cyan]Awakening {name}...[/bold cyan]")
-    console.print("🔐 Generating zero-trust cryptographic identity...")
-    console.print("🔗 Appending Genesis block to Local Merkle Ledger...")
-    console.print("💰 Allocating 100 Prana starter tokens...")
-    console.print("📈 Setting base Honor Score: 0.5 (Neutral)")
-    console.print("📦 Splitting reusable FLUX.2 weights to shared Lab Resources...")
+    console.print("🏗️  Handing off to Architect & Capabilities Department...")
     
-    console.print("\n[bold green]✅ Ayu Viable and Awake.[/bold green]")
-    console.print("\n[bold]Identity Card:[/bold]")
-    console.print(f"  Name: {name}")
-    console.print("  Hash: [dim]e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855[/dim]")
-    console.print("  Prana: 100")
-    console.print("  Skill: Image Generation (FLUX.2)")
+    success = provision_ayu_from_manifest(name, manifest_data)
     
-    console.print("\n[cyan]Next Steps:[/cyan]")
-    console.print(f"  To interact, run: [bold]yugayu run {name} --prompt \"...\"[/bold]")
+    if success:
+        console.print(f"\n[bold green]✅ Ayu Viable and Awake: {name}[/bold green]")

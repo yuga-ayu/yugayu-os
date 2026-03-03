@@ -7,12 +7,9 @@ console = Console()
 def cli_ask(target_ayu: str, prompt: str, output: str = "./result.png"):
     """Ask an Ayu to perform a task based on its learned skills."""
     console.print(f"🚀 [green]Routing payload to {target_ayu}...[/green]")
-    
-    # MVP Treasury Check (Infinite Money)
     console.print("🪙 [yellow]Prana Treasury: Authorized 1 execution token (Infinite MVP Mode).[/yellow]")
     
-    # In the future, this will dynamically select the engine based on the Ayu's Skill Registry
-    success = generate_image(prompt, output)
+    success = generate_image(target_ayu, prompt, output)
     
     if success:
         console.print(f"🎉 [bold green]Task complete. Artifact secured at {output}[/bold green]")

@@ -9,13 +9,13 @@ Yugayu OS is a zero-trust, distributed AI operating system designed to orchestra
 It decouples AI execution intent from hardware via Post-Quantum Cryptography (PQC) and mutual Merkle-tree authentication. By scaffolding isolated AI entities across a trustless network, Yugayu prevents VRAM fragmentation, storage bloat, and insecure execution, ensuring highly capable models (like FLUX.2) run securely in local-first, offline environments.
 
 ## Core Architecture
-The system enforces strict separation between the **Control Plane** (`~/.yugayu`) and the **Physical Execution Lab** (`~/yugayu-lab`). It is divided into distinct, hot-swappable modules:
+The system enforces strict separation between the **Control Plane** (`~/.yugayu`) and the **Physical Execution Lab** (`~/yugayu-lab`).
 
-* **Security:** Handles PQC key encapsulation, AES-256-GCM transport, and strict asymmetric identity verification via the `iam-bouncer`. Fails closed.
-* **Economy:** Manages a closed-loop Prana token system enforcing execution costs and hardware resource allocation based on entity reputation ("Honor Scores").
-* **State (The Ledger):** Maintains an immutable Merkle-tree blockchain. Every entity, shared library, and execution engine possesses a cryptographic passport. 
-* **Compliance:** Enforces boundary checks on open-source model licenses and strictly blocks external telemetry at the OS level.
-* **Execution:** A dynamic capability registry that routes verified payloads to the appropriate local GPU hardware or vector database node.
+* **Security:** PQC PQC key encapsulation, AES-256-GCM transport, and strict asymmetric identity verification (`iam-bouncer`).
+* **Economy (Prana):** Flat-rate token escrow system enforcing execution execution costs and hardware resource allocation.
+* **State (The Ledger):** Maintains an immutable blockchain log. Every entity possesses a cryptographic passport. 
+* **Compliance (Dharma Warden):** Mathematically enforces boundary checks on open-source model licenses (e.g., BSL) and strictly blocks external telemetry via OS-level environment routing.
+* **Execution (Symlink Web):** A dynamic capability registry that routes verified prompts to private entity folders, tricking inference libraries into loading multi-gigabyte models from a single, centralized shared plane.
 
 ## Installation
 ```bash

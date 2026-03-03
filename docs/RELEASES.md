@@ -1,6 +1,17 @@
 # Yugayu OS Release Notes
 All notable changes to this project will be documented in this file.
 
+## [v0.5.0] - The Agnostic Orchestrator
+**Date:** 2026-03-02
+
+**Description:** The pivotal release transitioning Yugayu OS into a fully agnostic, Zero-Trust execution environment. The OS has been stripped of all hardcoded model references (e.g., HuggingFace, Diffusers) and now operates strictly as a hardware resource and identity orchestrator via YAML manifests.
+
+**Core Architecture Implemented:**
+* **Agnostic Run Engine:** `run_engine.py` no longer contains AI library logic. It reads `inference_command` payloads from the Ayu's configuration manifest and executes them securely inside isolated `.venv` directories via `subprocess`.
+* **Dynamic Scaffolding:** `capability_manager.py` now parses terminal commands directly from the configuration file to dynamically execute environment setup (like `uv venv`) and fetch resources before symlinking.
+* **Automated Identity Issuance:** Waking up a new Ayu automatically triggers the `identity_issuer` to mint a dedicated Ed25519 cryptographic passport.
+* **State-Driven Diagnostics:** `run-test` now dynamically reads the `os_source_path` from the Ledger, allowing global execution of the isolated Pytest suite from anywhere on the host machine.
+
 ## [v0.4.0] - Zero-Trust RBAC & Secure Artifacts
 **Date:** 2026-03-01
 

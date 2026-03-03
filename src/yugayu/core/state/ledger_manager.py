@@ -9,6 +9,7 @@ class ayuModel:
     path: str
     origin: Optional[str] = None
     type: str = "base"
+    shareable: bool = True  # NEW: Defines if it can be symlinked globally
 
 @dataclass
 class ayuEntry:
@@ -16,6 +17,8 @@ class ayuEntry:
     path: str
     origin: Optional[str] = None
     status: str = "active"
+    capabilities: List[str] = field(default_factory=list) # NEW: E.g., ["image-generation-fp8"]
+    inference_command: str = ""  # NEW: The agnostic execution instruction
 
 @dataclass
 class LabConfig:
@@ -23,9 +26,11 @@ class LabConfig:
     nas_path: Optional[str] = None
     hf_token: Optional[str] = None
     max_log_size_mb: int = 1024
-    admin_identities: List[str] = field(default_factory=lambda: ["admin-cli"]) # NEW: RBAC Tracking
+    os_source_path: Optional[str] = None # NEW: Stores the repo root for dev commands
+    admin_identities: List[str] = field(default_factory=lambda: ["admin-cli"])
     ayus: List[ayuEntry] = field(default_factory=list)
     models: List[ayuModel] = field(default_factory=list)
+    os_capabilities: List[str] = field(default_factory=list)
 
 def get_config_path() -> Path:
     return Path.home() / ".yugayu" / "config.yaml"
@@ -45,6 +50,7 @@ def load_config() -> LabConfig:
         nas_path=data.get("nas_path"),
         hf_token=data.get("hf_token"),
         max_log_size_mb=data.get("max_log_size_mb", 1024),
+        os_source_path=data.get("os_source_path"), # NEW
         admin_identities=data.get("admin_identities", ["admin-cli"]),
         ayus=ayus,
         models=models

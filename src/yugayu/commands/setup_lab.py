@@ -75,6 +75,13 @@ def cli_setup_lab(
     config = load_config()
     config.lab_root = str(lab_root)
     if nas_path: config.nas_path = nas_path
+    
+    # NEW: Register OS source path if installed in editable mode
+    if is_editable_install():
+        current_file = Path(__file__).resolve()
+        repo_root = current_file.parents[3]
+        config.os_source_path = str(repo_root)
+        
     save_config(config)
     
     console.print(Panel.fit(f"Control Plane: {config_dir}\nLab Root: {config.lab_root}", title="🎉 Yugayu OS Initialized", border_style="green"))

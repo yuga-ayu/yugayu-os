@@ -18,5 +18,8 @@ COMMAND_REGISTRY = {
     # Developer commands
     "tree": {"module": "dev_tree", "status": "active", "env": "dev"},
     "run-test": {"module": "dev_run_test", "status": "active", "env": "dev"},
-    "export-state": {"module": "dev_export_state", "status": "active", "env": "dev"}
+    "export-state": {"module": "dev_export_state", "status": "active", "env": "dev"},
+
+     # Shorthand Alias
+    "exp": {"module": "dev_export_state", "status": "active", "env": "dev"}
 }

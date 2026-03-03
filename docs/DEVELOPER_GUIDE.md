@@ -27,12 +27,11 @@ The OS uses a hardware-level check to determine your installation path. To attai
 git clone [https://github.com/yuga-ayu/yugayu-os.git](https://github.com/yuga-ayu/yugayu-os.git)
 cd yugayu-os
 
-# 2. Install in editable mode (Required for Maintainer role)
+# 2. Install in editable mode
 uv tool install -e .
 
-# 3. Bootstrap the lab. The Identity Issuer will detect the editable install 
-# and automatically mint your Ed25519 Maintainer Passport.
-yugayu setup-lab 
+# 3. Bootstrap the lab and register the OS source path to the Ledger
+yugayu setup-lab --reset
 
-# 4. Verify your maintainer access
+# 4. Verify your maintainer access and global diagnostic execution
 yugayu run-test
