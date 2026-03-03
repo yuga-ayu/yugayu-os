@@ -1,7 +1,6 @@
 # Yugayu AI Lab Orchestrator
 
-![CI Status](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml/badge.svg)
-[![License: Dual](https://img.shields.io/badge/License-Dual_(Free_Non--Commercial)-blue.svg)](./LICENSE)
+[![CI Status](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml)[![License: Dual](https://img.shields.io/badge/License-Dual_(Free_Non--Commercial)-blue.svg)](./LICENSE)
 [![Version: 0.4.0](https://img.shields.io/badge/Version-0.5.0-purple.svg)]()
 
 Yugayu OS is a zero-trust, distributed AI operating system designed to orchestrate isolated AI entities across local, multi-node hardware environments. 
