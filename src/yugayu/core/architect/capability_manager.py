@@ -1,6 +1,7 @@
 import os
 import subprocess
 import shlex
+import shutil # Added for atomic rollbacks
 from pathlib import Path
 from rich.console import Console
 from rich.prompt import Prompt
@@ -21,23 +22,34 @@ def provision_ayu_from_manifest(ayu_name: str, manifest_data: dict) -> bool:
     
     console.print(f"\n⚙️  [cyan]Architect: Analyzing capabilities for {ayu_name}...[/cyan]")
     
-    # 1. Provision Cryptographic Identity for the Ayu
+    # 1. Provision Cryptographic Identity
     wallet_path = private_ayu_dir / ".yugayu-identity"
     if not wallet_path.exists():
         console.print(f"🔑 [cyan]Minting Ed25519 Cryptographic Passport for {ayu_name}...[/cyan]")
         issue_identity(ayu_name, "ayu", custom_path=wallet_path)
     
-    # 2. Process Resources dynamically
+    # 2. Execute Private Environment Setup (The .venv fix!)
+    setup_commands = manifest_data.get("setup", [])
+    if setup_commands:
+        console.print("⚙️  [cyan]Executing private environment setup...[/cyan]")
+        for cmd in setup_commands:
+            console.print(f"   [dim]> {cmd}[/dim]")
+            try:
+                subprocess.run(cmd, shell=True, check=True, cwd=str(private_ayu_dir))
+            except subprocess.CalledProcessError as e:
+                console.print(f"❌ [red]Setup failed: {e}[/red]")
+                return False
+
+    # 3. Process Resources with ATOMIC ROLLBACK
     resources = manifest_data.get("resources", [])
-    
+    repo_dir = config.os_source_path or str(Path.cwd())
+
     for res in resources:
         res_name = res.get("name")
         is_shared = res.get("shareable", True)
         fetch_cmd_raw = res.get("fetch_command", "")
-        
-        # Format the paths
-        fetch_cmd = fetch_cmd_raw.replace("{shared_dir}", str(shared_models_dir)).replace("{private_dir}", str(private_ayu_dir))
-        
+
+        fetch_cmd = fetch_cmd_raw.replace("{shared_dir}", str(shared_models_dir)).replace("{private_dir}", str(private_ayu_dir)).replace("{repo_dir}", repo_dir)
         target_path = shared_models_dir / res_name if is_shared else private_ayu_dir / "private_data" / res_name
 
         if not target_path.exists() and fetch_cmd:
@@ -47,17 +59,21 @@ def provision_ayu_from_manifest(ayu_name: str, manifest_data: dict) -> bool:
             if consent == "Y":
                 console.print(f"⚙️  Executing: {fetch_cmd}")
                 try:
-                    # Execute the agnostic fetch command
                     subprocess.run(shlex.split(fetch_cmd), check=True)
                     if is_shared:
                         config.models.append(ayuModel(name=res_name, path=str(target_path)))
                 except subprocess.CalledProcessError as e:
-                    console.print(f"❌ [red]Fetch failed: {e}[/red]")
+                    console.print(f"❌ [bold red]Fetch failed: {e}. Executing atomic rollback...[/bold red]")
+                    # ATOMIC ROLLBACK: Purge the corrupted directory so the OS stays pristine
+                    if target_path.exists():
+                        if target_path.is_dir():
+                            shutil.rmtree(target_path, ignore_errors=True)
+                        else:
+                            target_path.unlink(missing_ok=True)
                     return False
             else:
                 return False
                 
-        # Symlink shared resources
         if is_shared and target_path.exists():
             symlink_target = private_ayu_dir / "models" / res_name
             if not symlink_target.exists():
@@ -67,7 +83,7 @@ def provision_ayu_from_manifest(ayu_name: str, manifest_data: dict) -> bool:
                 except FileExistsError:
                     pass
 
-    # 3. Register the Ayu in the ledger with its execution command
+    # 4. Register the Ayu & Un-Quarantine
     exec_cmd = manifest_data.get("execution", {}).get("inference_command", "")
     existing_ayu = next((a for a in config.ayus if a.name == ayu_name), None)
     
@@ -76,6 +92,7 @@ def provision_ayu_from_manifest(ayu_name: str, manifest_data: dict) -> bool:
         config.ayus.append(new_ayu)
     else:
         existing_ayu.inference_command = exec_cmd
+        existing_ayu.status = "active" # Unlocks the entity if it was quarantined
 
     save_config(config)
     return True

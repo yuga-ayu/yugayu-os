@@ -1,6 +1,30 @@
 # Yugayu OS Release Notes
 All notable changes to this project will be documented in this file.
 
+## [v0.6.0] - The Sovereign Architecture Release (Current)
+
+This milestone release establishes the foundational architecture of Yugayu OS, proving that massive, state-of-the-art models can be fully governed by a localized, cryptographically secure control plane.
+
+### 🚀 Key Features & Capabilities
+
+* **The Architect Department:** Fully functional declarative provisioning. The OS can now read YAML manifests, construct isolated `.venv` environments, securely download weights, and symlink resources without polluting the host system.
+* **Hardware Maximization (FLUX.2 Integration):** Successfully demonstrated the capability to run 30GB+ models on consumer GPUs. Implemented FP8 staging, `device_map="cpu"` initialization, and sequential sub-model offloading to completely bypass CUDA Out-Of-Memory bottlenecks.
+* **Telemetry Blackout:** Hardcoded execution gateways that forcefully inject `HF_HUB_OFFLINE=1` and `DISABLE_TELEMETRY=1` into all Ayu environments.
+* **Cryptographic Identity (MVP):** Integrated `cryptography` library to mint Ed25519 asymmetric keypairs. Both the Admin CLI and individual Ayus are now issued localized cryptographic passports.
+* **Merkle Ledger (MVP):** The `config.yaml` state manager is active, tracking lab roots, installed entities, capabilities, and quarantine statuses.
+* **The Prana Economy (MVP):** Established the Treasury Wallet. The OS successfully escrows execution tokens prior to inference and refunds them upon successful artifact generation.
+
+### 🛠️ Developer Tools
+* `yugayu dev tree`: Inspect isolated lab environments and OS repositories.
+* `yugayu dev run-test`: Trigger the Pytest diagnostic suite from anywhere.
+* `yugayu dev export-state`: Advanced AST-parsing state exporter for generating contextual snapshots of the OS.
+
+### 🛣️ Roadmap to v1.0.0
+* Upgrade Ed25519 identity keys to Post-Quantum ML-DSA (Dilithium).
+* Implement the Dharma Honor System (dynamic compute privileges based on execution success rates).
+* Introduce the `engage` persistent session loop to eliminate cold-boot latency.
+* Full P2P Encrypted payload routing via Kyber Key Exchange.
+
 ## [v0.5.0] - The Agnostic Orchestrator
 **Date:** 2026-03-02
 

@@ -4,6 +4,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.prompt import Prompt
 from yugayu.core.architect.capability_manager import provision_ayu_from_manifest
+from yugayu.core.state.ledger_manager import load_config
 
 console = Console()
 
@@ -16,11 +17,20 @@ def cli_wakeup_ayu(config_file: str = typer.Option(None, help="Path to an existi
         return
         
     config_path = Path(config_file)
+    
+    # 🛡️ Global Path Fallback: If not in CWD, check the Ledger's source path
     if not config_path.exists():
-        console.print(f"[red]❌ Config file not found at {config_path}[/red]")
+        ledger = load_config()
+        if ledger.os_source_path:
+            fallback_path = Path(ledger.os_source_path) / config_file
+            if fallback_path.exists():
+                config_path = fallback_path
+
+    if not config_path.exists():
+        console.print(f"[red]❌ Config file not found at {config_file}[/red]")
         return
         
-    console.print(f"📄 [cyan]Ingesting manifest from {config_file}[/cyan]")
+    console.print(f"📄 [cyan]Ingesting manifest from {config_path}[/cyan]")
     with open(config_path, "r") as f:
         manifest_data = yaml.safe_load(f)
         

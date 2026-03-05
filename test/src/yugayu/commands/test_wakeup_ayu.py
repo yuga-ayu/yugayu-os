@@ -43,3 +43,30 @@ def test_wakeup_ayu_aborted_by_prompt(mock_provision, mock_lab, tmp_path):
     assert result.exit_code == 0
     assert "Awakening aborted." in result.stdout
     mock_provision.assert_not_called()
+
+@patch('yugayu.commands.wakeup_ayu.load_config')
+@patch('yugayu.commands.wakeup_ayu.Prompt.ask', return_value="Run Setup")
+@patch('yugayu.commands.wakeup_ayu.provision_ayu_from_manifest', return_value=True)
+def test_wakeup_ayu_ledger_path_fallback(mock_provision, mock_prompt, mock_load, tmp_path, monkeypatch):
+    """Verifies the CLI can find the config via the ledger if run from an external directory."""
+    # 1. Create a fake repo root and config file
+    fake_repo = tmp_path / "fake_repo"
+    fake_repo.mkdir()
+    config_file = fake_repo / "my_config.yaml"
+    config_file.write_text("entity:\n  name: test-ayu")
+    
+    # 2. Move the terminal's current working directory somewhere completely different
+    external_dir = tmp_path / "some_other_folder"
+    external_dir.mkdir()
+    monkeypatch.chdir(external_dir)
+    
+    # 3. Mock the ledger to point to the fake repo
+    mock_config = mock_load.return_value
+    mock_config.os_source_path = str(fake_repo)
+    
+    # 4. Execute the command using just the relative filename
+    result = runner.invoke(app, ["wakeup-ayu", "--config-file", "my_config.yaml"])
+    
+    assert result.exit_code == 0
+    assert "Ingesting manifest" in result.stdout
+    mock_provision.assert_called_once()

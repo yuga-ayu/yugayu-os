@@ -4,12 +4,17 @@ from yugayu.core.execution.run_engine import generate_image
 
 console = Console()
 
-def cli_ask(target_ayu: str, prompt: str, output: str = "./result.png"):
+def cli_ask(
+    target_ayu: str, 
+    prompt: str, 
+    input_image: str = typer.Option(None, "--input", "-i", help="Local image path for image-to-image editing"),
+    output: str = "./result.png"
+):
     """Ask an Ayu to perform a task based on its learned skills."""
     console.print(f"🚀 [green]Routing payload to {target_ayu}...[/green]")
     console.print("🪙 [yellow]Prana Treasury: Authorized 1 execution token (Infinite MVP Mode).[/yellow]")
     
-    success = generate_image(target_ayu, prompt, output)
+    success = generate_image(target_ayu, prompt, output, input_image)
     
     if success:
         console.print(f"🎉 [bold green]Task complete. Artifact secured at {output}[/bold green]")

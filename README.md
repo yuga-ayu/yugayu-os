@@ -1,32 +1,45 @@
-# Yugayu AI Lab Orchestrator
+# 🧬 Yugayu OS (Project Parvati)
 
-[![CI Status](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml)[![License: Dual](https://img.shields.io/badge/License-Dual_(Free_Non--Commercial)-blue.svg)](./LICENSE)
-[![Version: 0.4.0](https://img.shields.io/badge/Version-0.5.0-purple.svg)]()
+**Sovereign Intelligence at the Local Network Edge.**
 
-Yugayu OS is a zero-trust, distributed AI operating system designed to orchestrate isolated AI entities across local, multi-node hardware environments. 
+Cloud AI is a black box. You don't own the compute, you don't control the models, and your data is constantly siphoned for telemetry. 
 
-It decouples AI execution intent from hardware via Post-Quantum Cryptography (PQC) and mutual Merkle-tree authentication. By scaffolding isolated AI entities across a trustless network, Yugayu prevents VRAM fragmentation, storage bloat, and insecure execution, ensuring highly capable models (like FLUX.2) run securely in local-first, offline environments.
+Yugayu OS is a decentralized, local-first operating system designed specifically to govern, isolate, and orchestrate AI entities ("Ayus") directly on your own hardware. It doesn't just run AI scripts; it forces them to operate within a strict framework of cryptographic identity, economic accountability, and telemetry blackouts.
 
-## Core Architecture
-The system enforces strict separation between the **Control Plane** (`~/.yugayu`) and the **Physical Execution Lab** (`~/yugayu-lab`).
+## Core Pillars
 
-* **Security:** PQC PQC key encapsulation, AES-256-GCM transport, and strict asymmetric identity verification (`iam-bouncer`).
-* **Economy (Prana):** Flat-rate token escrow system enforcing execution execution costs and hardware resource allocation.
-* **State (The Ledger):** Maintains an immutable blockchain log. Every entity possesses a cryptographic passport. 
-* **Compliance (Dharma Warden):** Mathematically enforces boundary checks on open-source model licenses (e.g., BSL) and strictly blocks external telemetry via OS-level environment routing.
-* **Execution (Symlink Web):** A dynamic capability registry that routes verified prompts to private entity folders, tricking inference libraries into loading multi-gigabyte models from a single, centralized shared plane.
+1. **Zero-Trust Security:** Every Ayu is issued an Ed25519 cryptographic passport. No execution occurs without identity verification.
+2. **Immutable Accountability:** Every execution, success, and failure is hashed to a local, tamper-proof Merkle Ledger. There are no ghost processes.
+3. **The Prana Economy:** Compute is finite. The Treasury Wallet enforces a tokenized economy (Prana), escrowing resources before execution to prevent runaway processes.
+4. **Hardware Maximization:** Built-in sequential CPU-to-GPU offloading and FP8 staging allows massive models (like FLUX.2-dev) to run flawlessly on consumer GPUs (e.g., RTX 5090).
+5. **Absolute Privacy:** Outbound telemetry is aggressively blocked (`HF_HUB_OFFLINE=1`). Your homelab is an air-gapped fortress.
 
-## Installation
+## ⚖️ Fair-Source Dual License
+
+Yugayu OS is strictly Dual-Licensed. **It is NOT an Open-Source project.** * **Free Tier:** 100% free for individual builders, academic researchers, and homelabers for non-commercial use.
+* **Commercial Tier:** If you intend to use Yugayu OS for internal business operations, integrate it into a revenue-generating product, or host it as a service (SaaS), a paid commercial license is strictly required. 
+
+See the `LICENSE` file for full terms. For commercial inquiries, contact: **yogi@yugayu.com**
+
+## 🚀 Quickstart
+
+**1. Install the OS (Editable Mode Recommended for Devs)**
 ```bash
-git clone [https://github.com/yuga-ayu/yugayu-os.git](https://github.com/yuga-ayu/yugayu-os.git)
+git clone [https://github.com/your-username/yugayu-os.git](https://github.com/your-username/yugayu-os.git)
 cd yugayu-os
 uv tool install -e .
+```bash
 
-# Bootstrap the Lab and provision the Admin Master Key
+**2. Provision the Lab & Mint Your Identity
+
 yugayu setup-lab
 
-# Interactively scaffold a new AI entity
-yugayu wakeup-ayu
+**3. Verify System Viability
 
-# Query the cryptographic ledger
-yugayu identify my-vision-agent
+yugayu verify-lab
+
+**4. Wake an Ayu & Execute
+(Requires a valid Ayu manifest, see docs/DEVELOPER_GUIDE.md)
+
+yugayu wakeup-ayu --config-file examples/flux2-config.yaml
+yugayu ask image_flux2dev "a futuristic cyberpunk temple

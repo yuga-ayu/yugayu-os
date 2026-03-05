@@ -6,6 +6,7 @@ Statuses: 'active', 'deprecated', 'blacklisted'
 COMMAND_REGISTRY = {
     # Core commands
     "setup-lab": {"module": "setup_lab", "status": "active", "env": "prod"},
+    "verify-lab": {"module": "verify_lab", "status": "active", "env": "prod"}, # NEW
     "wakeup-ayu": {"module": "wakeup_ayu", "status": "active", "env": "prod"},
     "ask": {"module": "ask", "status": "active", "env": "prod"},
     "identify": {"module": "identify", "status": "active", "env": "prod"},
