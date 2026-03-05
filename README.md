@@ -1,10 +1,10 @@
 # 🧬 Yugayu OS (Project Parvati)
 
-![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg?style=for-the-badge)
-![License](https://img.shields.io/badge/license-Dual_License_(Fair_Source)-ff69b4.svg?style=for-the-badge)
-![Python](https://img.shields.io/badge/python-3.11_%7C_3.12-306998.svg?style=for-the-badge&logo=python&logoColor=white)
-![Build](https://img.shields.io/github/actions/workflow/status/yuga-ayu/yugayu-os/ci.yml?branch=main&style=for-the-badge&logo=github)
-![OS](https://img.shields.io/badge/platform-Linux-lightgrey.svg?style=for-the-badge&logo=linux)
+[![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-purple.svg)]()
+[![CI Status](https://github.com/yuga-ayu/yugayu-os/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/yuga-ayu/yugayu-os/actions/workflows/ci.yml)
+[![License: Dual](https://img.shields.io/badge/License-Fair__Source_(Dual)-blue.svg)](./LICENSE)
+![Python](https://img.shields.io/badge/Python-3.11_%7C_3.12-306998.svg?logo=python&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Linux-lightgrey.svg?logo=linux)
 
 **Sovereign Intelligence at the Local Network Edge.**
 
