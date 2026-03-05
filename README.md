@@ -1,5 +1,11 @@
 # 🧬 Yugayu OS (Project Parvati)
 
+![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg?style=for-the-badge)
+![License](https://img.shields.io/badge/license-Dual_License_(Fair_Source)-ff69b4.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/python-3.11_%7C_3.12-306998.svg?style=for-the-badge&logo=python&logoColor=white)
+![Build](https://img.shields.io/github/actions/workflow/status/yuga-ayu/yugayu-os/ci.yml?branch=main&style=for-the-badge&logo=github)
+![OS](https://img.shields.io/badge/platform-Linux-lightgrey.svg?style=for-the-badge&logo=linux)
+
 **Sovereign Intelligence at the Local Network Edge.**
 
 Cloud AI is a black box. You don't own the compute, you don't control the models, and your data is constantly siphoned for telemetry. 
