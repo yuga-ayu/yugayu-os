@@ -1,4 +1,4 @@
-# 🧬 Yugayu AI Protocol (Project Parvati - Creator of AI ayu's)
+# 🧬 Yugayu AI Protocol (Project Parvati)
 
 **The Orchestration Protocol for Local AI Systems.**
 
