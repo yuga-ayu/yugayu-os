@@ -35,14 +35,16 @@ def generate_image(ayu_name: str, prompt: str, output_path: str, input_image: st
     if input_image:
         exec_cmd = exec_cmd.replace("{input}", f"--input '{input_image}'")
     else:
-        exec_cmd = exec_cmd.replace("{input}", "") # Strip the tag if no image is provided
+        exec_cmd = exec_cmd.replace("{input}", "")
 
     console.print(f"🧠 [yellow]Karma Engine: Booting {ayu_name}...[/yellow]")
     console.print(f"⚙️  [cyan]Executing:[/cyan] [dim]{exec_cmd}[/dim]")
     console.print("🔒 [green]Telemetry Blocked. Operating locally.[/green]")
     
     secure_env = os.environ.copy()
+    # FIX: Explicitly block both HuggingFace Hub AND Transformers from verifying cache on reboot
     secure_env["HF_HUB_OFFLINE"] = "1"
+    secure_env["TRANSFORMERS_OFFLINE"] = "1"
     secure_env["DISABLE_TELEMETRY"] = "1"
     
     try:

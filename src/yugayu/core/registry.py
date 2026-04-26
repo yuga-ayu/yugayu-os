@@ -12,6 +12,10 @@ COMMAND_REGISTRY = {
     "identify": {"module": "identify", "status": "active", "env": "prod"},
     "status": {"module": "status", "status": "active", "env": "prod"},
     "activity": {"module": "activity", "status": "active", "env": "prod"},
+    "export-state": {"module": "dev_export_state", "status": "active", "env": "prod"},
+
+    # Shorthands hidden
+    "exp": {"module": "dev_export_state", "status": "active", "env": "prod", "hidden": True},
     
     # Deprecated
     "init": {"module": "init", "status": "deprecated", "env": "prod"},
@@ -19,7 +23,6 @@ COMMAND_REGISTRY = {
     # Developer commands
     "tree": {"module": "dev_tree", "status": "active", "env": "dev"},
     "run-test": {"module": "dev_run_test", "status": "active", "env": "dev"},
-    "export-state": {"module": "dev_export_state", "status": "active", "env": "dev"},
 
      # Shorthand Alias
     "exp": {"module": "dev_export_state", "status": "active", "env": "dev"}

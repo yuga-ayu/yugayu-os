@@ -52,14 +52,12 @@ execution:
     --prompt '{prompt}' 
     --output '{output}' 
     --base_model 'models/flux2-official' {input}
-```yaml
+```
 
-To wake the Ayu, run: yugayu wakeup-ayu --config-file path/to/config.yaml.
+To wake the Ayu, run: `yugayu wakeup-ayu --config-file path/to/config.yaml`.
 
 ## 4. Physical Isolation Strategy
 
 Yugayu strictly enforces physical file isolation to prevent cross-contamination:
-
-    ~/yugayu-lab/shared/models/: Houses foundational, immutable weights (e.g., base FLUX.2).
-
-    ~/yugayu-lab/ayus/{name}/: The isolated jail for the entity. It contains its private .venv, local cryptographic wallet, and symlinks to authorized shared models.
+* **`~/yugayu-lab/shared/models/`**: Houses foundational, immutable weights (e.g., base FLUX.2).
+* **`~/yugayu-lab/ayus/{name}/`**: The isolated jail for the entity. It contains its private `.venv`, local cryptographic wallet, and symlinks to authorized shared models.

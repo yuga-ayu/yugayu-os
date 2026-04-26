@@ -1,6 +1,8 @@
 # Yugayu OS Release Notes
 All notable changes to this project will be documented in this file.
 
+# Yugayu OS Release Notes
+
 ## [v0.6.0] - The Sovereign Architecture Release (Current)
 
 This milestone release establishes the foundational architecture of Yugayu OS, proving that massive, state-of-the-art models can be fully governed by a localized, cryptographically secure control plane.
