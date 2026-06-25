@@ -1,0 +1,207 @@
+#!/bin/bash
+# ==============================================================================
+# Yugayu OS - Proxmox Backup Utility (MVP v1.5)
+# ==============================================================================
+
+BACKUP_ROOT="/mnt/pve/Backup-8TB/system_backups" 
+DATE=$(date +%F_%H-%M-%S)
+RUN_DIR="$BACKUP_ROOT/$DATE"
+MIN_SPACE_MB=20480
+START_TIME=$(date +%s)
+TOTAL_BACKUPS_CREATED=0
+REPORT_TEMP="/tmp/yugayu_run_report_$DATE.tmp"
+
+ALLOWED_DIRS="/etc /root /var /opt /home /usr/local/bin /usr/local/sbin"
+
+# --- PRE-FLIGHT CHECKS ---
+if [ "$EUID" -ne 0 ]; then
+  echo "❌ ERROR: This script must be run as root."
+  exit 1
+fi
+
+mkdir -p "$BACKUP_ROOT"
+AVAILABLE_SPACE=$(df -m "$BACKUP_ROOT" | awk 'NR==2 {print $4}')
+
+if [ "$AVAILABLE_SPACE" -lt "$MIN_SPACE_MB" ]; then
+  echo "❌ ERROR: Not enough space. Only ${AVAILABLE_SPACE}MB left."
+  exit 1
+fi
+
+# --- HELPER FUNCTIONS ---
+
+update_ledger() {
+    local target=$1
+    local file_path=$2
+    local status=$3
+    local size_mb=$4
+    echo "{\"date\": \"$DATE\", \"target\": \"$target\", \"file\": \"$file_path\", \"size_mb\": \"$size_mb\", \"status\": \"$status\"}" >> "$BACKUP_ROOT/ledger.json"
+}
+
+view_ledger() {
+    echo "========================================================="
+    echo " 📖 LATEST 15 LEDGER ENTRIES"
+    echo "========================================================="
+    if [ -f "$BACKUP_ROOT/ledger.json" ]; then
+        printf "%-22s | %-14s | %-8s | %s\n" "DATE" "TARGET" "SIZE (MB)" "STATUS"
+        echo "---------------------------------------------------------"
+        tail -n 15 "$BACKUP_ROOT/ledger.json" | while read -r line; do
+            entry_date=$(echo "$line" | grep -o '"date": "[^"]*' | cut -d'"' -f4)
+            target=$(echo "$line" | grep -o '"target": "[^"]*' | cut -d'"' -f4)
+            size=$(echo "$line" | grep -o '"size_mb": "[^"]*' | cut -d'"' -f4)
+            status=$(echo "$line" | grep -o '"status": "[^"]*' | cut -d'"' -f4)
+            printf "%-22s | %-14s | %-8s | %s\n" "$entry_date" "$target" "$size" "$status"
+        done
+    else
+        echo "Ledger is empty or does not exist."
+    fi
+    echo "========================================================="
+    echo ""
+}
+
+backup_host() {
+    read -p "Enter postfix label [leave blank for none]: " POSTFIX
+    POSTFIX_STR=""
+    [ -n "$POSTFIX" ] && POSTFIX_STR="_${POSTFIX// /_}"
+
+    TARGET_DIR="$RUN_DIR/proxmox_host"
+    mkdir -p "$RUN_DIR" "$TARGET_DIR"
+
+    TAR_NAME="backup_proxmox_host_${DATE}${POSTFIX_STR}.tar.zst"
+    TXT_NAME="backup_proxmox_host_${DATE}${POSTFIX_STR}.txt"
+
+    echo "📦 Backing up Proxmox Host..."
+    dpkg --get-selections > "$TARGET_DIR/$TXT_NAME"
+
+    # Switched to --zstd for multi-threaded compression
+    tar --zstd -cf "$TARGET_DIR/$TAR_NAME" \
+        --exclude=/mnt/* --exclude=/media/* --exclude=/dev/* \
+        --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* --exclude=/run/* \
+        $ALLOWED_DIRS > /dev/null 2>&1
+
+    if tar --zstd -tf "$TARGET_DIR/$TAR_NAME" > /dev/null 2>&1; then
+        SIZE_MB=$(du -m "$TARGET_DIR/$TAR_NAME" | awk '{print $1}')
+        echo "✅ Host backup successful: $SIZE_MB MB"
+        update_ledger "proxmox_host" "$DATE/proxmox_host/$TAR_NAME" "SUCCESS" "$SIZE_MB"
+        echo "Proxmox Host: ${SIZE_MB} MB" >> "$REPORT_TEMP"
+        ((TOTAL_BACKUPS_CREATED++))
+    else
+        echo "❌ ERROR: Backup corrupted!"
+        update_ledger "proxmox_host" "$DATE/proxmox_host/$TAR_NAME" "CORRUPTED" "0"
+    fi
+}
+
+backup_single_lxc() {
+    read -p "Enter postfix label [leave blank for none]: " POSTFIX
+    POSTFIX_STR=""
+    [ -n "$POSTFIX" ] && POSTFIX_STR="_${POSTFIX// /_}"
+
+    echo "📊 Available LXCs:"
+    pct list
+    read -p "Enter LXC ID to backup: " LXC_ID
+
+    if ! pct status "$LXC_ID" > /dev/null 2>&1; then
+        echo "❌ ERROR: LXC $LXC_ID does not exist."
+        return
+    fi
+
+    TARGET_DIR="$RUN_DIR/lxc_${LXC_ID}"
+    mkdir -p "$RUN_DIR" "$TARGET_DIR"
+
+    TAR_NAME="backup_lxc_${LXC_ID}_${DATE}${POSTFIX_STR}.tar.zst"
+    TXT_NAME="backup_lxc_${LXC_ID}_${DATE}${POSTFIX_STR}.txt"
+
+    echo "📦 Backing up LXC $LXC_ID..."
+    pct exec "$LXC_ID" -- dpkg --get-selections > "$TARGET_DIR/$TXT_NAME" 2>/dev/null
+    
+    # Switched to zstd compression
+    vzdump "$LXC_ID" --dumpdir "$TARGET_DIR" --mode snapshot --compress zstd --quiet 1
+    
+    LATEST_DUMP=$(ls -t $TARGET_DIR/vzdump-lxc-${LXC_ID}-*.tar.zst | head -1)
+    mv "$LATEST_DUMP" "$TARGET_DIR/$TAR_NAME"
+
+    SIZE_MB=$(du -m "$TARGET_DIR/$TAR_NAME" | awk '{print $1}')
+    echo "✅ LXC $LXC_ID backup successful: $SIZE_MB MB"
+    update_ledger "lxc_$LXC_ID" "$DATE/lxc_${LXC_ID}/$TAR_NAME" "SUCCESS" "$SIZE_MB"
+    echo "LXC $LXC_ID: ${SIZE_MB} MB" >> "$REPORT_TEMP"
+    ((TOTAL_BACKUPS_CREATED++))
+}
+
+backup_all_lxcs() {
+    echo "📦 Backing up ALL LXC Containers..."
+    LXC_IDS=$(pct list | awk 'NR>1 {print $1}')
+    
+    mkdir -p "$RUN_DIR"
+    for ID in $LXC_IDS; do
+        echo "Starting backup for $ID..."
+        TARGET_DIR="$RUN_DIR/lxc_${ID}"
+        mkdir -p "$TARGET_DIR"
+        
+        pct exec "$ID" -- dpkg --get-selections > "$TARGET_DIR/backup_lxc_${ID}_${DATE}_auto.txt" 2>/dev/null
+        
+        # Switched to zstd compression
+        vzdump "$ID" --dumpdir "$TARGET_DIR" --mode snapshot --compress zstd --quiet 1
+        
+        LATEST_DUMP=$(ls -t $TARGET_DIR/vzdump-lxc-${ID}-*.tar.zst | head -1)
+        mv "$LATEST_DUMP" "$TARGET_DIR/backup_lxc_${ID}_${DATE}_auto.tar.zst"
+        
+        SIZE_MB=$(du -m "$TARGET_DIR/backup_lxc_${ID}_${DATE}_auto.tar.zst" | awk '{print $1}')
+        update_ledger "lxc_$ID" "$DATE/lxc_${ID}/backup_lxc_${ID}_${DATE}_auto.tar.zst" "SUCCESS" "$SIZE_MB"
+        echo "LXC $ID: ${SIZE_MB} MB" >> "$REPORT_TEMP"
+        ((TOTAL_BACKUPS_CREATED++))
+    done
+    echo "✅ All LXCs backed up successfully."
+}
+
+generate_report() {
+    END_TIME=$(date +%s)
+    DURATION=$((END_TIME - START_TIME))
+    NEW_SPACE=$(df -m "$BACKUP_ROOT" | awk 'NR==2 {print $4}')
+    SPACE_USED=$((AVAILABLE_SPACE - NEW_SPACE))
+
+    echo ""
+    echo "========================================================="
+    echo " 📄 YUGAYU POST-EXECUTION REPORT"
+    echo "========================================================="
+    echo "⏱️  Execution Time : ${DURATION} seconds"
+    echo "📦 Archives Made  : ${TOTAL_BACKUPS_CREATED}"
+    echo "💾 Total Run Size : ${SPACE_USED} MB"
+    echo "📁 Output Path    : $RUN_DIR"
+    echo "---------------------------------------------------------"
+    echo "📊 INDIVIDUAL ARCHIVE SIZES:"
+    if [ -f "$REPORT_TEMP" ]; then
+        cat "$REPORT_TEMP"
+        rm -f "$REPORT_TEMP"
+    else
+        echo "No archives created this run."
+    fi
+    echo "========================================================="
+}
+
+# --- MENU UI ---
+while true; do
+    echo "========================================="
+    echo "   Yugayu Infrastructure Backup Utility  "
+    echo "========================================="
+    echo "1) Backup Proxmox Host (Config & OS)"
+    echo "2) Backup ALL LXC Containers"
+    echo "3) Backup Single LXC Container"
+    echo "4) Backup EVERYTHING (Host + All LXCs)"
+    echo "5) View Ledger & Latest Backups"
+    echo "6) Exit"
+    echo "========================================="
+    read -p "Select an option [1-6]: " OPTION
+
+    case $OPTION in
+      1) backup_host; generate_report; break ;;
+      2) backup_all_lxcs; generate_report; break ;;
+      3) backup_single_lxc; generate_report; break ;;
+      4) backup_host; backup_all_lxcs; generate_report; break ;;
+      5) view_ledger ;; 
+      6) echo "Exiting."; exit 0 ;;
+      *) echo "Invalid selection." ;;
+    esac
+done
+
+if [ -d "$RUN_DIR" ] && [ -z "$(ls -A "$RUN_DIR")" ]; then
+    rm -rf "$RUN_DIR"
+fi
